@@ -30,14 +30,14 @@ Usage
 Once the extension is installed, simply use it in your code by to create Ajax upload area :
 
 ```php
-echo \kato\DropZone::widget();
+echo \andru\dropzone\DropZone::widget();
 ```
 
 
 To pass options : (More details at [dropzonejs official docs](http://www.dropzonejs.com/#toc_6) )
 
 ```php
-echo \andru\DropZone::widget([
+echo \andru\dropzone\DropZone::widget([
        'options' => [
            'maxFilesize' => '2',
        ],
