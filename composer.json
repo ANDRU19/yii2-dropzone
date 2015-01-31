@@ -1,0 +1,30 @@
+{
+    "name": "andru19/yii2-dropzone",
+    "description": "DropzoneJs Extention for Yii2",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension","dropzone","upload"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Parminder Klair",
+            "email": "perminder.klair@gmail.com"
+           
+        },
+        {
+            "name": "Andrew",
+            "email": "andriy.ry@gmail.com"
+           
+        }
+
+    ],
+    
+   "require": {
+        "yiisoft/yii2": "2.0.*",
+          "bower-asset/dropzone": "~3.10"
+    },
+    "autoload": {
+        "psr-4": {
+           "andru\\dropzone\\": ""
+        }
+    }
+}
