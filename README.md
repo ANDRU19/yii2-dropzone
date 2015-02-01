@@ -1,74 +1,49 @@
-Yii2 Dropzone
-=============
-DropzoneJs Extention for Yii2
+Dropzone Extension for Yii 2
+==============================
 
-A port of [DropzoneJs](http://www.dropzonejs.com/) for Yii2 Framework
+This extension provides the [Dropzone](http://www.dropzonejs.com/) integration for the Yii2 framework.
+
 
 Installation
 ------------
+
+This extension requires [Dropzone](https://github.com/enyo/dropzone)
 
 The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
 
 Either run
 
 ```
-php composer.phar require --prefer-dist andru19/yii2-dropzone "dev-master"
+php composer.phar require --prefer-dist devgroup/yii2-dropzone "*"
 ```
 
 or add
 
 ```
-"andru19/yii2-dropzone": "dev-master"
+"devgroup/yii2-dropzone": "*"
 ```
 
-to the require section of your `composer.json` file.
+to the require section of your composer.json.
 
 
-Usage
------
-
-Once the extension is installed, simply use it in your code by to create Ajax upload area :
+General Usage
+-------------
 
 ```php
-echo \kato\DropZone::widget();
+use andru\dropzone\DropZone;
+
+DropZone::widget(
+    [
+        'name' => 'file', // input name or 'model' and 'attribute'
+        'url' => '', // upload url
+        'storedFiles' => [], // stores files
+        'eventHandlers' => [], // dropzone event handlers
+        'sortable' => true, // sortable flag
+        'sortableOptions' => [], // sortable options
+        'htmlOptions' => [], // container html options
+        'options' => [], // dropzone js options
+    ]
+)
 ```
 
-
-To pass options : (More details at [dropzonejs official docs](http://www.dropzonejs.com/#toc_6) )
-
-```php
-echo \andru\DropZone::widget([
-       'options' => [
-           'maxFilesize' => '2',
-       ],
-       'clientEvents' => [
-           'complete' => "function(file){console.log(file)}",
-           'removedfile' => "function(file){alert(file.name + ' is removed')}"
-       ],
-   ]);
-```
-
-Example of upload method :
-
-```php
-public function actionUpload()
-{
-    $fileName = 'file';
-    $uploadPath = './files';
-
-    if (isset($_FILES[$fileName])) {
-        $file = \yii\web\UploadedFile::getInstanceByName($fileName);
-
-        //Print file data
-        //print_r($file);
-
-        if ($file->saveAs($uploadPath . '/' . $file->name)) {
-            //Now save file data to database
-
-            echo \yii\helpers\Json::encode($file);
-        }
-    }
-
-    return false;
-}
-```
+you can also register `devgroup\dropzone\UploadAction` and `devgroup\dropzone\RemoveAction` actions in your controller

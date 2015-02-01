@@ -2,84 +2,117 @@
 
 namespace andru\dropzone;
 
+use Yii;
+use yii\base\Widget;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
-use andru\dropzone\DropZoneAsset;
+use yii\helpers\Url;
 
-/**
- * Usage: \andru\dropzonejs\DropZone::widget();
- * Class DropZone
- */
-class DropZone extends \yii\base\Widget
+class DropZone extends Widget
 {
-    /**
-     * @var array An array of options that are supported by Dropzone
-     */
+    public $model;
+    public $attribute;
+    public $htmlOptions = [];
+    public $name;
     public $options = [];
+    public $eventHandlers = [];
+    public $url;
+    public $storedFiles = [];
+    public $sortable = false;
+    public $sortableOptions = [];
 
-    /**
-     * @var array An array of client events that are supported by Dropzone
-     */
-    public $clientEvents = [];
+    protected $dropzoneName = 'dropzone';
 
-    //Default Values
-    public $id = 'myDropzone';
-    public $uploadUrl = '/site/upload';
-    public $dropzoneContainer = 'myDropzone';
-    public $previewsContainer = 'previews';
-    public $autoDiscover = false;
-
-    /**
-     * Initializes the widget
-     * @throw InvalidConfigException
-     */
     public function init()
     {
         parent::init();
 
-        //set defaults
-        if (!isset($this->options['url'])) $this->options['url'] = $this->uploadUrl; // Set the url
-        if (!isset($this->options['previewsContainer'])) $this->options['previewsContainer'] = '#' . $this->previewsContainer; // Define the element that should be used as click trigger to select files.
-        if (!isset($this->options['clickable'])) $this->options['clickable'] = true; // Define the element that should be used as click trigger to select files.
-        $this->autoDiscover = $this->autoDiscover===false?'false':'true';
-        
-        if(\Yii::$app->getRequest()->enableCsrfValidation){
-            $this->options['headers'][\yii\web\Request::CSRF_HEADER] = \Yii::$app->getRequest()->getCsrfToken();
-            $this->options['params'][\Yii::$app->getRequest()->csrfParam] = \Yii::$app->getRequest()->getCsrfToken();
-        }
+        Html::addCssClass($this->htmlOptions, 'dropzone');
+        $this->dropzoneName = 'dropzone_' . $this->id;
+    }
 
-        \Yii::setAlias('@dropzone', dirname(__FILE__));
-        $this->registerAssets();
+    private function registerAssets()
+    {
+        DropZoneAsset::register($this->getView());
+        $this->getView()->registerJs('Dropzone.autoDiscover = false;');
+    }
+
+    protected function addFiles($files = [])
+    {
+        foreach ($files as $file) {
+            // Create the mock file:
+            $this->getView()->registerJs(
+                'var mockFile = { name: "' . $file['name'] . '", size: ' . $file['size'] . ' };'
+            );
+            // Call the default addedfile event handler
+            $this->getView()->registerJs(
+                $this->dropzoneName . '.emit("addedfile", mockFile);'
+            );
+            // And optionally show the thumbnail of the file:
+            $this->getView()->registerJs(
+                $this->dropzoneName . '.emit("thumbnail", mockFile, "/images/testimonial/' . $file['thumbnail'] . '");'
+            );
+        }
+    }
+
+    protected function decrementMaxFiles($num)
+    {
+        $this->getView()->registerJs(
+            'if (' . $this->dropzoneName . '.options.maxFiles > 0) { '
+            . $this->dropzoneName . '.options.maxFiles = '
+            . $this->dropzoneName . '.options.maxFiles - ' . $num . ';'
+            . ' }'
+        );
+    }
+
+    protected function createDropzone()
+    {
+        $options = Json::encode($this->options);
+        $this->getView()->registerJs($this->dropzoneName . ' = new Dropzone("#' . $this->id . '", ' . $options . ');');
     }
 
     public function run()
     {
-        return Html::tag('div', $this->renderDropzone(), ['id' => $this->dropzoneContainer, 'class' => 'dropzone']);
-    }
-
-    private function renderDropzone()
-    {
-        $data = Html::tag('div', '', ['id' => $this->previewsContainer,'class' => 'dropzone-previews']);
-
-        return $data;
-    }
-
-    /**
-     * Registers the needed assets
-     */
-    public function registerAssets()
-    {
-        $view = $this->getView();
-
-        $js = 'Dropzone.autoDiscover = ' . $this->autoDiscover . '; var ' . $this->id . ' = new Dropzone("div#' . $this->dropzoneContainer . '", ' . Json::encode($this->options) . ');';
-
-        if (!empty($this->clientEvents)) {
-            foreach ($this->clientEvents as $event => $handler) {
-                $js .= "$this->id.on('$event', $handler);";
-            }
+        if (empty($this->name) && (!empty($this->model) && !empty($this->attribute))) {
+            $this->name = Html::getInputName($this->model, $this->attribute);
         }
 
-        $view->registerJs($js);
-        DropZoneAsset::register($view);
+        if (empty($this->url)) {
+            $this->url = Url::toRoute(['site/upload']);
+        }
+
+        $options = [
+            'url' => $this->url,
+            'paramName' => $this->name,
+            'params' => [],
+        ];
+
+        if (Yii::$app->request->enableCsrfValidation) {
+            $options['params'][Yii::$app->request->csrfParam] = Yii::$app->request->getCsrfToken();
+        }
+
+        $this->htmlOptions['id'] = $this->id;
+        $this->options = ArrayHelper::merge($this->options, $options);
+        echo Html::tag('div', '', $this->htmlOptions);
+
+        $this->registerAssets();
+
+        $this->createDropzone();
+
+        foreach ($this->eventHandlers as $event => $handler) {
+            $handler = new \yii\web\JsExpression($handler);
+            $this->getView()->registerJs(
+                $this->dropzoneName . ".on('{$event}', {$handler})"
+            );
+        }
+
+        $this->addFiles($this->storedFiles);
+        $this->decrementMaxFiles(count($this->storedFiles));
+
+        if ($this->sortable) {
+            $options = Json::encode($this->sortableOptions);
+            $this->getView()->registerJs("jQuery('#{$this->id}').sortable(" . $options . ");");
+        }
     }
 }
