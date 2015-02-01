@@ -24,10 +24,14 @@
     ],
     "require": {
         "yiisoft/yii2": "2.0.*",
+<<<<<<< HEAD
         "bower-asset/dropzone": "4.0.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "2.0.*"
+=======
+          "bower-asset/dropzone": "4.0.0"
+>>>>>>> 2efa8e8783dc87824f154f250106f4d02b43a186
     },
     "autoload": {
         "psr-4": {

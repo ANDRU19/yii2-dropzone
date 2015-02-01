@@ -23,13 +23,28 @@ or add
 "devgroup/yii2-dropzone": "*"
 ```
 
+<<<<<<< HEAD
 to the require section of your composer.json.
+=======
+to the require section of your `composer.json` file.
+
+
+Usage
+-----
+
+Once the extension is installed, simply use it in your code by to create Ajax upload area :
+
+```php
+echo \andru\dropzone\DropZone::widget();
+```
+>>>>>>> 2efa8e8783dc87824f154f250106f4d02b43a186
 
 
 General Usage
 -------------
 
 ```php
+<<<<<<< HEAD
 use andru\dropzone\DropZone;
 
 DropZone::widget(
@@ -44,6 +59,17 @@ DropZone::widget(
         'options' => [], // dropzone js options
     ]
 )
+=======
+echo \andru\dropzone\DropZone::widget([
+       'options' => [
+           'maxFilesize' => '2',
+       ],
+       'clientEvents' => [
+           'complete' => "function(file){console.log(file)}",
+           'removedfile' => "function(file){alert(file.name + ' is removed')}"
+       ],
+   ]);
+>>>>>>> 2efa8e8783dc87824f154f250106f4d02b43a186
 ```
 
 you can also register `devgroup\dropzone\UploadAction` and `devgroup\dropzone\RemoveAction` actions in your controller
