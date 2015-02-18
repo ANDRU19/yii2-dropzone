@@ -30,7 +30,7 @@
     "require-dev": {
         "yiisoft/yii2-debug": "2.0.*",
 
-          "bower-asset/dropzone": "4.0.0"
+      
 
     },
     "autoload": {
