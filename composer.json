@@ -28,7 +28,7 @@
         "bower-asset/dropzone": "~4.0"
     },
     "require-dev": {
-        "yiisoft/yii2-debug": "2.0.*",
+        "yiisoft/yii2-debug": "2.0.*"
 
       
 
