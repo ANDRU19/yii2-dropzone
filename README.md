@@ -23,7 +23,7 @@ or add
 "devgroup/yii2-dropzone": "*"
 ```
 
-<<<<<<< HEAD
+
 to the require section of your composer.json.
 =======
 to the require section of your `composer.json` file.
