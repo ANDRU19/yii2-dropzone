@@ -72,4 +72,4 @@ echo \andru\dropzone\DropZone::widget([
 
 
 
-you can also register `devgroup\dropzone\UploadAction` and `devgroup\dropzone\RemoveAction` actions in your controller
+you can also register `andru\dropzone\UploadAction` and `andru\dropzone\RemoveAction` actions in your controller
