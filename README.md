@@ -14,13 +14,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-php composer.phar require --prefer-dist devgroup/yii2-dropzone "*"
+php composer.phar require --prefer-dist andru/yii2-dropzone "*"
 ```
 
 or add
 
 ```
-"devgroup/yii2-dropzone": "*"
+"andru/yii2-dropzone": "*"
 ```
 
 
