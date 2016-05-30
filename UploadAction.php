@@ -12,6 +12,7 @@ class UploadAction extends Action
 {
     public $fileName = 'file';
     public $upload = '';
+    public $uploadUrl;
 
     public $afterUploadHandler = null;
     public $afterUploadData = null;
@@ -23,16 +24,15 @@ class UploadAction extends Action
     {
         parent::init();
 
-        $this->uploadDir = Yii::getAlias('@images/testimonial/' . $this->upload . '/');
-        $this->uploadSrc = Yii::getAlias('images/testimonial/' . $this->upload . '/');
+        $this->uploadDir = Yii::getAlias( $this->uploadUrl . $this->upload . '/');
+        $this->uploadSrc = Yii::getAlias($this->uploadUrl . $this->upload . '/');
     }
 
     public function setUpload($upload)
     {
         $this->upload = $upload;
-
-        $this->uploadDir = Yii::getAlias('@images/testimonial/' . $this->upload . '/');
-        $this->uploadSrc = Yii::getAlias('images/testimonial/' . $this->upload . '/');
+        $this->uploadDir = Yii::getAlias($this->uploadUrl . $this->upload . '/');
+        $this->uploadSrc = Yii::getAlias($this->uploadUrl . $this->upload . '/');
     }
 
     public function run()
@@ -47,7 +47,9 @@ class UploadAction extends Action
             $fileName = $file->baseName . '-' . uniqid() . '.' . $file->extension;
         }
         $file->saveAs($this->uploadDir . $fileName);
-
+        $upload = \Yii::$app->session['upload'];
+        $upload[] = $fileName;
+        \Yii::$app->session['upload'] = $upload;
         $response = [
             'filename' => $fileName,
         ];

@@ -18,6 +18,7 @@ class DropZone extends Widget
     public $options = [];
     public $eventHandlers = [];
     public $url;
+    public $uploadUrl;
     public $storedFiles = [];
     public $sortable = false;
     public $sortableOptions = [];
@@ -30,46 +31,6 @@ class DropZone extends Widget
 
         Html::addCssClass($this->htmlOptions, 'dropzone');
         $this->dropzoneName = 'dropzone_' . $this->id;
-    }
-
-    private function registerAssets()
-    {
-        DropZoneAsset::register($this->getView());
-        $this->getView()->registerJs('Dropzone.autoDiscover = false;');
-    }
-
-    protected function addFiles($files = [])
-    {
-        foreach ($files as $file) {
-            // Create the mock file:
-            $this->getView()->registerJs(
-                'var mockFile = { name: "' . $file['name'] . '", size: ' . $file['size'] . ' };'
-            );
-            // Call the default addedfile event handler
-            $this->getView()->registerJs(
-                $this->dropzoneName . '.emit("addedfile", mockFile);'
-            );
-            // And optionally show the thumbnail of the file:
-            $this->getView()->registerJs(
-                $this->dropzoneName . '.emit("thumbnail", mockFile, "/images/testimonial/' . $file['thumbnail'] . '");'
-            );
-        }
-    }
-
-    protected function decrementMaxFiles($num)
-    {
-        $this->getView()->registerJs(
-            'if (' . $this->dropzoneName . '.options.maxFiles > 0) { '
-            . $this->dropzoneName . '.options.maxFiles = '
-            . $this->dropzoneName . '.options.maxFiles - ' . $num . ';'
-            . ' }'
-        );
-    }
-
-    protected function createDropzone()
-    {
-        $options = Json::encode($this->options);
-        $this->getView()->registerJs($this->dropzoneName . ' = new Dropzone("#' . $this->id . '", ' . $options . ');');
     }
 
     public function run()
@@ -110,9 +71,58 @@ class DropZone extends Widget
         $this->addFiles($this->storedFiles);
         $this->decrementMaxFiles(count($this->storedFiles));
 
-        if ($this->sortable) {
-            $options = Json::encode($this->sortableOptions);
-            $this->getView()->registerJs("jQuery('#{$this->id}').sortable(" . $options . ");");
+
+    }
+
+    private function registerAssets()
+    {
+        DropZoneAsset::register($this->getView());
+        $this->getView()->registerJs('Dropzone.autoDiscover = false;');
+    }
+
+    protected function createDropzone()
+    {
+        $options = Json::encode($this->options);
+        $this->getView()->registerJs($this->dropzoneName . ' = new Dropzone("#' . $this->id . '", ' . $options . ');');
+    }
+
+    protected function addFiles($files = [])
+    {
+        $i = 1;
+        foreach ($files as $file) {
+            $i++;
+            // Create the mock file:
+            $this->getView()->registerJs(
+                'var mockFile' . $i . ' = { name: "' . $file['name'] . '", size: ' . $file['size'] . ' };'
+            );
+
+
+            // Call the default addedfile event handler
+            $this->getView()->registerJs(
+
+                $this->dropzoneName . '.emit("addedfile", mockFile' . $i . ');'
+
+            );
+
+            // And optionally show the thumbnail of the file:
+            $this->getView()->registerJs(
+                $this->dropzoneName . '.emit("thumbnail", mockFile' . $i .',"' .$this->uploadUrl. $file['name'] . '");'
+            );
+            $this->getView()->registerJs(
+                $this->dropzoneName . '.emit("complete", mockFile' . $i . ');'
+            );
+
+
         }
+    }
+
+    protected function decrementMaxFiles($num)
+    {
+        $this->getView()->registerJs(
+            'if (' . $this->dropzoneName . '.options.maxFiles > 0) { '
+            . $this->dropzoneName . '.options.maxFiles = '
+            . $this->dropzoneName . '.options.maxFiles - ' . $num . ';'
+            . ' }'
+        );
     }
 }
